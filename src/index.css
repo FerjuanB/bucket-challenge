@@ -3,7 +3,7 @@ html{
 }
 
 body{
-  min-height: 98vh;
+  min-height: 100vh;
   font-family: 'Outfit',sans-serif;
   font-size: 2rem;
   background-color: bisque;
@@ -27,21 +27,71 @@ h3{
   width: 95%;
   
 }
+.btn{
+  background-color: #e77122;
+  width: 50%;
+  margin: 1rem auto;
+  color: white;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+}
+.btn:disabled{
+  opacity: 0.5;
+}
+
+.error{
+  color: red;
+  font-size: 1.6rem;
+  font-weight: 600;
+}
 .form{
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin: 0;
+  margin: 0 auto;
 }
 .solution{
+  color:#e77122;
   display:grid;
   grid-template-columns: 1fr 1fr;
+  margin: 0 auto;
+}
+.buttons{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.sol{
+  background-color: #e77122;
+  color: white;
+  border:none;
+  padding: 0.2rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+.sol:disabled{
+  opacity: 0.5;
+}
+.solution h4{
+  color: black;
+  text-align: center;
   margin: 0;
+}
+.solution p{
+  margin: 0;
+  text-align: center;
+}
+.instruction{
+  color: blue;
 }
 .success{
   color: green;
   font-size: 2rem;
   font-weight: 600;
   text-align: center;
-  margin: 0;
+  margin: 0 auto;
 }

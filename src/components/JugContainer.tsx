@@ -55,16 +55,16 @@ export const JugContainer = () => {
                   onChange={handleChange}
                   value={jugSizes[jug as keyof typeof jugSizes] || ""}
                 />
-                {errors[jug as keyof typeof errors] && <p className="error">{errors[jug as keyof typeof errors]}</p>}
+                {errors[jug] && <p className="error">{errors[jug]}</p>}
               </div>
             ))}
           </div>
-          <button type="submit" disabled={!isValid}>Start Game</button>
+          <button className="btn" type="submit" disabled={!isValid}>Start Game</button>
         </form>
       ) : (
         <>
           <JugSolution xJar={jugSizes.xjug} yJar={jugSizes.yjug} target={jugSizes.zjug} />
-          <button onClick={resetGame}>Reset Game</button>
+          <button className="btn" onClick={resetGame}>Reset Game</button>
         </>
       )}
     </div>

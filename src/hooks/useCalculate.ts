@@ -124,6 +124,8 @@ export const useCalculate = (xJar: number, yJar: number, target: number) => {
     getCurrentInstruction,
     currentInstructionIndex,
     instructions,
-    updateTrigger
+    updateTrigger,
+    checkAndAdvanceInstruction
+
   };
 };
