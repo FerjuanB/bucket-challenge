@@ -1,50 +1,26 @@
-# React + TypeScript + Vite
+# Bucket challenge for Chicks Gold Developer Vacancy.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This UI was made in react, typescript and vite. and has a test in the custom hook created. 
 
-Currently, two official plugins are available:
+I've created an UI to do the bucket challenge that permit to fill 3 simple inputs:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+x jug: the quantity of gallons for first bucket
+y jug: the quantity of gallonf for second bucket
+z jug: the result that you want to achieve. 
 
-## Expanding the ESLint configuration
+UI Development: If this result in z jar is possible, the UI will tell you what instructions to follow to get the result by just filling, transferring between jars or emptying at each step, until you get the desired result that was entered at first.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
+# Instalation
+I you want to use locally, just only need to clone this repo
+```bash
+git clone https://github.com/FerjuanB/bucket-challenge.git
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+cd bucket-challenge
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+pnpm install
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+pnpm run dev
+
+or simply use the deploy of project `[Bucket-Challenge](https://chicks-challenge-fjb.netlify.app/)`
