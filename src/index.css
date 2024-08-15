@@ -1,0 +1,15 @@
+html{
+  font-size: 62,5%;
+}
+
+body{
+  min-height: 98vh;
+  font-family: 'Outfit',sans-serif;
+  font-size: 2rem;
+}
+
+.container{
+  max-width: 60rem;
+  margin: 0 auto;
+  width: 95%;
+}
