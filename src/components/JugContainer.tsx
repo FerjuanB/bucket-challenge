@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useCalculate } from "../hooks/useCalculate";
+import { JugSolution } from "./JugSolution";
 
 export const JugContainer = () => {
   const [errors, setErrors] = useState<Record<string, string>>({
@@ -21,7 +22,7 @@ export const JugContainer = () => {
     validatedValues?.yjug ?? 0,
     validatedValues?.zjug ?? 0
   );
-
+ 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = parseInt(value);
@@ -116,37 +117,15 @@ export const JugContainer = () => {
       </div>
       <div>
         {validatedValues && (
-          <>
-            <h3>Step: {currentStep?.action}</h3>
-            <p>Jug X: {currentStep?.x ?? 0} gallons</p>
-            <p>Jug Y: {currentStep?.y ?? 0} gallons</p>
-            <p>Total steps: {steps.length}</p>
-            <p>Total water used: {calculateTotalWaterUsed(steps)} gallons</p>
-
-            {/* Botones para navegar entre los pasos */}
-            <button type="button" onClick={previousStep} disabled={currentStepIndex === 0}>
-              Previous
-            </button>
-            <button type="button" onClick={nextStep} disabled={currentStepIndex === (steps.length - 1)}>
-              Next
-            </button>
-
-            {/* Visualización gráfica simple */}
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
-              <div>
-                <div style={{ width: '50px', height: '100px', border: '1px solid black', position: 'relative' }}>
-                  <div style={{ position: 'absolute', bottom: 0, width: '100%', height: `${(currentStep?.x ?? 0) / jugCalc.xJug * 100}%`, backgroundColor: 'blue' }}></div>
-                </div>
-                <p>Jug X</p>
-              </div>
-              <div>
-                <div style={{ width: '50px', height: '100px', border: '1px solid black', position: 'relative' }}>
-                  <div style={{ position: 'absolute', bottom: 0, width: '100%', height: `${(currentStep?.y ?? 0) / jugCalc.yJug * 100}%`, backgroundColor: 'blue' }}></div>
-                </div>
-                <p>Jug Y</p>
-              </div>
-            </div>
-          </>
+          <JugSolution 
+            currentStep={currentStep}
+            nextStep={nextStep}
+            previousStep={previousStep}
+            currentStepIndex={currentStepIndex}
+            steps={steps}
+            calculateTotalWaterUsed={calculateTotalWaterUsed}
+            validatedValues={validatedValues}
+            jugCalc={jugCalc}/>
         )}
       </div>
     </form>

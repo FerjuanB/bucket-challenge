@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
+import { Step } from "../types";
 
-interface Step {
-    action: string;
-    x: number;
-    y: number;
-}
+
 
 
 export const useCalculate = (xJar: number, yJar: number, target: number) => {
@@ -20,6 +17,7 @@ export const useCalculate = (xJar: number, yJar: number, target: number) => {
       const addStep = (action: string, xJarAmount: number, yJarAmount: number) => {
         calculatedSteps.push({ action, x: xJarAmount, y: yJarAmount });
       };
+
 
       const gcd = (a: number, b: number): number => {
         return b === 0 ? a : gcd(b, a % b);
