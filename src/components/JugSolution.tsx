@@ -1,50 +1,67 @@
-
-import { Step } from "../types";
+import { FC, useEffect } from "react";
+import { useCalculate } from "../hooks/useCalculate";
 
 type JugSolutionProps = {
-    currentStep: Step | undefined;
-    nextStep: () => void;
-    previousStep: () => void;
-    currentStepIndex: number;
-    steps: Step[];
-    calculateTotalWaterUsed: (steps: Step[]) => number;
-    validatedValues: Record<string, number>;
-    jugCalc: Record<string, number>;
-  }
-
-export const JugSolution = ({currentStep,nextStep,previousStep,currentStepIndex,steps,calculateTotalWaterUsed,validatedValues,jugCalc}: JugSolutionProps) => {
-     
-      
-  return (
-<>
-            <h3>Step: {currentStep?.action}</h3>
-            <p>Jug X: {currentStep?.x ?? 0} gallons</p>
-            <p>Jug Y: {currentStep?.y ?? 0} gallons</p>
-            <p>Total steps: {steps.length}</p>
-            <p>Total water used: {calculateTotalWaterUsed(steps)} gallons</p>
-
-            {/* Botones para navegar entre los pasos */}
-            <button type="button" onClick={previousStep} disabled={currentStepIndex === 0}>
-              Previous
-            </button>
-            <button type="button" onClick={nextStep} disabled={currentStepIndex === (steps.length - 1)}>
-              Next
-            </button>
-
-            {/* Visualización gráfica simple */}
-            <div style={{ display: 'flex', justifyContent: 'space-around', marginTop: '20px' }}>
-              <div>
-                <div style={{ width: '50px', height: '100px', border: '1px solid black', position: 'relative' }}>
-                  <div style={{ position: 'absolute', bottom: 0, width: '100%', height: `${(currentStep?.x ?? 0) / jugCalc.xJug * 100}%`, backgroundColor: 'blue' }}></div>
-                </div>
-                <p>Jug X</p>
-              </div>
-              <div>
-                <div style={{ width: '50px', height: '100px', border: '1px solid black', position: 'relative' }}>
-                  <div style={{ position: 'absolute', bottom: 0, width: '100%', height: `${(currentStep?.y ?? 0) / jugCalc.yJug * 100}%`, backgroundColor: 'blue' }}></div>
-                </div>
-                <p>Jug Y</p>
-              </div>
-            </div>
-          </>  )
+  xJar: number;
+  yJar: number;
+  target: number;
 }
+
+export const JugSolution: FC<JugSolutionProps> = ({ xJar, yJar, target }) => {
+  const { 
+    xCurrent, 
+    yCurrent, 
+    steps, 
+    fillX, 
+    fillY, 
+    emptyX, 
+    emptyY, 
+    pourXtoY, 
+    pourYtoX, 
+    isComplete, 
+    getCurrentInstruction,
+    currentInstructionIndex,
+    instructions,
+    updateTrigger
+  } = useCalculate(xJar, yJar, target);
+
+  // Usar updateTrigger en el renderizado para forzar la actualización
+  useEffect(() => {
+    // Este efecto se ejecutará cada vez que updateTrigger cambie
+  }, [updateTrigger]);
+
+  return (
+    <>  
+    <div className="solution">
+      <div>
+
+      <h3>Current State</h3>
+      <p>Jug X: {xCurrent} / {xJar} gallons</p>
+      <p>Jug Y: {yCurrent} / {yJar} gallons</p>
+      <p>Target: {target} gallons</p>
+
+      <h4>Current Instruction:</h4>
+      <p>{getCurrentInstruction() || "Challenge complete!"}</p>
+
+      
+        <button onClick={fillX} disabled={xCurrent === xJar}>Fill X</button>
+        <button onClick={fillY} disabled={yCurrent === yJar}>Fill Y</button>
+        <button onClick={emptyX} disabled={xCurrent === 0}>Empty X</button>
+        <button onClick={emptyY} disabled={yCurrent === 0}>Empty Y</button>
+        <button onClick={pourXtoY} disabled={xCurrent === 0 || yCurrent === yJar}>Pour X to Y</button>
+        <button onClick={pourYtoX} disabled={yCurrent === 0 || xCurrent === xJar}>Pour Y to X</button>
+      
+      </div>
+          <div>
+          <h4>Steps taken: {currentInstructionIndex} / {instructions.length}</h4>
+               <ol>
+                 {steps.map((step, index) => (
+                   <li key={index}>{step}</li>
+                  ))}
+               </ol>
+          </div>
+    </div>
+      {isComplete && <h3 className="success">Congratulations! You've reached the target!</h3>}
+                  </>
+  );
+};

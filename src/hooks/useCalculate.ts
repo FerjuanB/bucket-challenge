@@ -1,91 +1,129 @@
-import { useEffect, useMemo, useState } from "react"
-import { Step } from "../types";
-
-
-
+import { useState, useEffect, useCallback } from "react";
 
 export const useCalculate = (xJar: number, yJar: number, target: number) => {
-  const [steps, setSteps] = useState<Step[]>([]);
-  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [xCurrent, setXCurrent] = useState(0);
+  const [yCurrent, setYCurrent] = useState(0);
+  const [steps, setSteps] = useState<string[]>([]);
+  const [instructions, setInstructions] = useState<string[]>([]);
+  const [currentInstructionIndex, setCurrentInstructionIndex] = useState(0);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   useEffect(() => {
-    const solve = () => {
-      const calculatedSteps: Step[] = [];
-      let xJarAmount = 0;
-      let yJarAmount = 0;
-
-      const addStep = (action: string, xJarAmount: number, yJarAmount: number) => {
-        calculatedSteps.push({ action, x: xJarAmount, y: yJarAmount });
-      };
-
-
-      const gcd = (a: number, b: number): number => {
-        return b === 0 ? a : gcd(b, a % b);
-      };
-
-      if (target % gcd(xJar, yJar) !== 0) {
-        addStep("Impossible to reach target", xJarAmount, yJarAmount);
-        setSteps(calculatedSteps);
-        return;
-      }
-
-      const tryFillFirst = (firstJar: number, secondJar: number, isXFirst: boolean) => {
-        let first = 0, second = 0;
-        while (first !== target && second !== target) {
-          if (first === 0) {
-            first = firstJar;
-            addStep(isXFirst ? "Fill X" : "Fill Y", isXFirst ? first : xJarAmount, isXFirst ? yJarAmount : first);
-          } else if (second === secondJar) {
-            second = 0;
-            addStep(isXFirst ? "Drain Y" : "Drain X", isXFirst ? first : second, isXFirst ? second : first);
-          } else {
-            const transferAmount = Math.min(first, secondJar - second);
-            first -= transferAmount;
-            second += transferAmount;
-            addStep(isXFirst ? "Transfer X to Y" : "Transfer Y to X", isXFirst ? first : second, isXFirst ? second : first);
-          }
-          if (first === target || second === target) break;
-          if (calculatedSteps.length > 1000) {
-            addStep("Too many steps, possibly no solution", first, second);
-            break;
-          }
+    const generateInstructions = () => {  
+      const newInstructions: string[] = [];
+      let x = 0, y = 0;
+      
+      while (x !== target && y !== target) {
+        if (x === 0) {
+          newInstructions.push(`Fill jug X (${xJar} gallons)`);
+          x = xJar;
+        } else if (y === yJar) {
+          newInstructions.push(`Empty jug Y`);
+          y = 0;
+        } else {
+          const pour = Math.min(x, yJar - y);
+          newInstructions.push(`Pour ${pour} gallons from X to Y`);
+          x -= pour;
+          y += pour;
         }
-      };
-
-      // Try filling X first
-      tryFillFirst(xJar, yJar, true);
-
-      // If filling X first didn't work, try filling Y first
-      if (calculatedSteps[calculatedSteps.length - 1].action !== "Impossible to reach target" && 
-          calculatedSteps[calculatedSteps.length - 1].x !== target && 
-          calculatedSteps[calculatedSteps.length - 1].y !== target) {
-        calculatedSteps.length = 0; // Clear steps
-        tryFillFirst(yJar, xJar, false);
       }
-
-      setSteps(calculatedSteps);
+      setInstructions(newInstructions);
     };
 
-    solve();
+    generateInstructions();
   }, [xJar, yJar, target]);
-const calculateTotalWaterUsed = (steps: Step[]): number => {
-  return steps.reduce((total, step) => {
-    if (step.action === "Fill X") total += step.x;
-    if (step.action === "Fill Y") total += step.y;
-    return total;
-  }, 0);}
+
+  const getCurrentInstruction = useCallback(() => instructions[currentInstructionIndex], [instructions, currentInstructionIndex]);
+
+  const forceUpdate = useCallback(() => {
+    setUpdateTrigger(prev => prev + 1);
+  }, []);
+
+  const checkAndAdvanceInstruction = useCallback(() => {
+    const currentInstruction = getCurrentInstruction();
+    if (
+      (currentInstruction?.includes("Fill jug X") && xCurrent === xJar) ||
+      (currentInstruction?.includes("Empty jug Y") && yCurrent === 0) ||
+      (currentInstruction?.includes("Pour") && 
+       xCurrent === xJar - parseInt(currentInstruction.split(' ')[1]) &&
+       yCurrent === parseInt(currentInstruction.split(' ')[1]))
+    ) {
+      setCurrentInstructionIndex(prev => {
+        console.log("Advancing to next instruction:", prev + 1);
+        return prev + 1;
+      });
+      forceUpdate();
+    }
+  }, [xCurrent, yCurrent, xJar, yJar, getCurrentInstruction, forceUpdate]);
   
-  const nextStep = () => {
-    setCurrentStepIndex(prev => Math.min(prev + 1, steps.length - 1));
+  const fillX = useCallback(() => {
+    if (xCurrent < xJar) {
+      setXCurrent(xJar);
+      setSteps(prev => [...prev, "Filled X"]);
+      checkAndAdvanceInstruction();
+    }
+  }, [xCurrent, xJar, checkAndAdvanceInstruction]);
+
+  const fillY = useCallback(() => {
+    if (yCurrent < yJar) {
+      setYCurrent(yJar);
+      setSteps(prev => [...prev, "Filled Y"]);
+      checkAndAdvanceInstruction();
+    }
+  }, [yCurrent, yJar, checkAndAdvanceInstruction]);
+
+  const emptyX = useCallback(() => {
+    if (xCurrent > 0) {
+      setXCurrent(0);
+      setSteps(prev => [...prev, "Emptied X"]);
+      checkAndAdvanceInstruction();
+    }
+  }, [xCurrent, checkAndAdvanceInstruction]);
+
+  const emptyY = useCallback(() => {
+    if (yCurrent > 0) {
+      setYCurrent(0);
+      setSteps(prev => [...prev, "Emptied Y"]);
+      checkAndAdvanceInstruction();
+    }
+  }, [yCurrent, checkAndAdvanceInstruction]);
+
+  const pourXtoY = useCallback(() => {
+    if (xCurrent > 0 && yCurrent < yJar) {
+      const amount = Math.min(xCurrent, yJar - yCurrent);
+      setXCurrent(prev => prev - amount);
+      setYCurrent(prev => prev + amount);
+      setSteps(prev => [...prev, `Poured ${amount} from X to Y`]);
+      checkAndAdvanceInstruction();
+    }
+  }, [xCurrent, yCurrent, yJar, checkAndAdvanceInstruction]);
+
+  const pourYtoX = useCallback(() => {
+    if (yCurrent > 0 && xCurrent < xJar) {
+      const amount = Math.min(yCurrent, xJar - xCurrent);
+      setYCurrent(prev => prev - amount);
+      setXCurrent(prev => prev + amount);
+      setSteps(prev => [...prev, `Poured ${amount} from Y to X`]);
+      checkAndAdvanceInstruction();
+    }
+  }, [yCurrent, xCurrent, xJar, checkAndAdvanceInstruction]);
+
+  const isComplete = xCurrent === target || yCurrent === target;
+
+  return {
+    xCurrent,
+    yCurrent,
+    steps,
+    fillX,
+    fillY,
+    emptyX,
+    emptyY,
+    pourXtoY,
+    pourYtoX,
+    isComplete,
+    getCurrentInstruction,
+    currentInstructionIndex,
+    instructions,
+    updateTrigger
   };
-
-  const previousStep = () => {
-    setCurrentStepIndex(prev => Math.max(prev - 1, 0));
-  };
-
-  const currentStep = useMemo(() => steps[currentStepIndex], [currentStepIndex, steps]);
-
-  
-
-  return { steps, currentStep, nextStep, previousStep,currentStepIndex,calculateTotalWaterUsed };
 };
